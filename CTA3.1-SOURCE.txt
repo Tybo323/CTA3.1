@@ -1,0 +1,88 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Random;
+
+public class MyMenu extends JFrame {
+    private JTextArea textArea;
+
+    public MyMenu() {
+        setTitle("Menu Example");
+        setSize(400, 300);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+
+        JMenuBar menuBar = new JMenuBar();
+        JMenu menu = new JMenu("Options");
+
+        JMenuItem menuItem1 = new JMenuItem("Print Date and Time");
+        JMenuItem menuItem2 = new JMenuItem("Save to log.txt");
+        JMenuItem menuItem3 = new JMenuItem("Change Background Color");
+        JMenuItem menuItem4 = new JMenuItem("Exit");
+
+        menu.add(menuItem1);
+        menu.add(menuItem2);
+        menu.add(menuItem3);
+        menu.add(menuItem4);
+        menuBar.add(menu);
+
+        setJMenuBar(menuBar);
+
+        textArea = new JTextArea();
+        add(new JScrollPane(textArea), BorderLayout.CENTER);
+
+        menuItem1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+                LocalDateTime now = LocalDateTime.now();
+                textArea.append("Current Date and Time: " + dtf.format(now) + "\n");
+            }
+        });
+
+        menuItem2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try (BufferedWriter writer = new BufferedWriter(new FileWriter("log.txt", true))) {
+                    writer.write(textArea.getText());
+                    writer.newLine();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
+
+        menuItem3.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Random rand = new Random();
+                float hue = rand.nextFloat() * 0.33f; // Random hue in the green range
+                Color randomGreen = Color.getHSBColor(hue, 1.0f, 1.0f);
+                getContentPane().setBackground(randomGreen);
+                JOptionPane.showMessageDialog(null, "Background color changed to hue: " + hue);
+            }
+        });
+
+        menuItem4.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new MyMenu().setVisible(true);
+            }
+        });
+    }
+}
